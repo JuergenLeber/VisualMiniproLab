@@ -140,11 +140,28 @@ struct SoftwareUpdateSection: View {
         case unknownBundle
     }
 
-    private let softwareBundleHelpUrl = "https://github.com/moozzyk/MiniproUI/wiki/Software-Bundles-for-T56-and-T76"
+    private let softwareBundleDownloadUrl = "https://github.com/Kreeblah/XGecu_Software/tree/master/Xgpro/13"
 
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
     @State private var softwareChecksumStatus: SoftwareBundleVerificationStatus?
+
+    /// The bundle installed for the connected programmer, remembered across
+    /// launches - installing clears the selection to re-render the section.
+    private var installedBundle: InstalledSoftwareBundle? {
+        guard let programmerModel = programmerInfo?.model else {
+            return nil
+        }
+        return UserDefaults.standard.installedSoftwareBundle(for: programmerModel)
+    }
+
+    private var bundleFileName: String? {
+        firmwareUrl?.lastPathComponent ?? installedBundle?.fileName
+    }
+
+    private var bundleChecksumStatus: SoftwareBundleVerificationStatus? {
+        softwareChecksumStatus ?? installedBundle?.verificationStatus
+    }
 
     private var missingAlgorithmsInfo: MissingAlgorithmsInfo? {
         guard
@@ -261,7 +278,7 @@ struct SoftwareUpdateSection: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 4) {
                         Text("Software Bundle file:")
-                        if let fileName = firmwareUrl?.lastPathComponent {
+                        if let fileName = bundleFileName {
                             Text(fileName)
                                 .font(.system(.body, design: .monospaced))
                         } else {
@@ -269,31 +286,40 @@ struct SoftwareUpdateSection: View {
                         }
                     }
                     .help(firmwareUrl?.path ?? "")
-                    if let softwareChecksumStatus,
-                        let verificationDetails = verificationDetails(for: softwareChecksumStatus)
+                    if let bundleChecksumStatus,
+                        let verificationDetails = verificationDetails(for: bundleChecksumStatus)
                     {
                         Text(verificationDetails)
                             .font(.caption)
-                            .foregroundColor(verificationCaptionColor(for: softwareChecksumStatus))
+                            .foregroundColor(verificationCaptionColor(for: bundleChecksumStatus))
                     }
                 }
                 Spacer()
-                if let softwareChecksumStatus {
-                    Image(systemName: checksumIcon(for: softwareChecksumStatus))
-                        .foregroundColor(checksumColor(for: softwareChecksumStatus))
-                        .help(verificationDetails(for: softwareChecksumStatus) ?? "")
+                if let bundleChecksumStatus {
+                    Image(systemName: checksumIcon(for: bundleChecksumStatus))
+                        .foregroundColor(checksumColor(for: bundleChecksumStatus))
+                        .help(verificationDetails(for: bundleChecksumStatus) ?? "")
                 }
                 UpdateFirmwareButton(
                     firmwareUrl: $firmwareUrl,
                     programmerInfo: $programmerInfo,
-                    buttonCaption: "Install..."
+                    buttonCaption: "Install...",
+                    onSoftwareBundleInstalled: { url in
+                        if let programmerModel = programmerInfo?.model {
+                            UserDefaults.standard.setInstalledSoftwareBundle(
+                                url.lastPathComponent,
+                                verificationStatus: softwareChecksumStatus,
+                                for: programmerModel
+                            )
+                        }
+                    }
                 )
             }.disabled(firmwareUrl == nil)
             Link(
-                "Learn more about Software Bundles for T56 and T76 programmers",
-                destination: URL(string: softwareBundleHelpUrl)!
+                "Software bundles can be downloaded from the XGecu_Software repository",
+                destination: URL(string: softwareBundleDownloadUrl)!
             )
-            .help(softwareBundleHelpUrl)
+            .help(softwareBundleDownloadUrl)
         }
     }
 }
@@ -316,6 +342,7 @@ struct UpdateFirmwareButton: View {
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
     let buttonCaption: String
+    var onSoftwareBundleInstalled: ((URL) -> Void)? = nil
     @State private var progressUpdate: ProgressUpdate?
     @State private var errorAlertTitle = "Firmware Update Failed"
     @State private var errorMessage: DialogErrorMessage?
@@ -401,6 +428,19 @@ struct UpdateFirmwareButton: View {
             try algorithmsXml.write(to: algorithmsUrl, atomically: true, encoding: .utf8)
             logger.notice("Saved algorithms XML to \(algorithmsUrl.path, privacy: .public)")
 
+            // Adapter and ICSP images are a bonus - keep going if the bundle has none.
+            do {
+                let installedImages = try XgproImageUtils.installImages(
+                    from: outputDirectory,
+                    programmerModel: firmwareInfo.programmerModel
+                )
+                logger.notice("Installed \(installedImages, privacy: .public) chip images")
+            } catch {
+                logger.notice(
+                    "Failed to install chip images: \(error.localizedDescription, privacy: .public)"
+                )
+            }
+
             guard let installedFirmwareVersion = programmerInfo.getFirmwareVersionNumber() else {
                 throw MiniproAPIError.programmerInfoUnavailable
             }
@@ -409,6 +449,7 @@ struct UpdateFirmwareButton: View {
                 let firmwareFile = outputDirectory.appendingPathComponent(firmwareInfo.fileName)
                 try await installFirmware(using: firmwareFile)
             }
+            onSoftwareBundleInstalled?(url)
             // Trigger re-render to hide missing algorithms banner
             firmwareUrl = nil
         } catch {
