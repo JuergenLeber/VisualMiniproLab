@@ -201,6 +201,21 @@ build_minipro() {
         GIT_DATE="$git_date" >/dev/null
 }
 
+# minipro's infoic.xml carries 255 comments with a literal "--" inside them,
+# which XML forbids. XMLDocument then refuses to parse the file and the app
+# silently loses its chip classification (SupportedDevicesProcessor puts every
+# chip in both categories), so collapse the hyphen runs on the way in.
+install_xml() {
+    local src="$1" dest="$2"
+
+    perl -0777 -pe 's{<!--(.*?)-->}{my $c = $1; $c =~ s/-{2,}/-/g; "<!--$c-->"}gse' "$src" > "$dest"
+    chmod 644 "$dest"
+    if command -v xmllint >/dev/null 2>&1; then
+        xmllint --noout "$dest" \
+            || fail "$(basename "$dest") is not well-formed XML even after sanitizing"
+    fi
+}
+
 install_artifacts() {
     local prefix="${WORK_DIR}/out/libusb"
 
@@ -211,14 +226,15 @@ install_artifacts() {
     # both with the real identity when it copies them into the bundle.
     codesign --force --sign - "${PROJECT_ROOT}/libusb-1.0.0.dylib" 2>/dev/null
 
-    install -m 644 "${MINIPRO_SRC}/infoic.xml" "${PROJECT_ROOT}/infoic.xml"
-    install -m 644 "${MINIPRO_SRC}/logicic.xml" "${PROJECT_ROOT}/logicic.xml"
+    install_xml "${MINIPRO_SRC}/infoic.xml" "${PROJECT_ROOT}/infoic.xml"
+    install_xml "${MINIPRO_SRC}/logicic.xml" "${PROJECT_ROOT}/logicic.xml"
 
     if ! git -C "$MINIPRO_SRC" cat-file -e "${LEGACY_TAG}:infoic.xml" 2>/dev/null; then
         git -C "$MINIPRO_SRC" fetch --tags origin >/dev/null 2>&1 || true
     fi
-    git -C "$MINIPRO_SRC" show "${LEGACY_TAG}:infoic.xml" > "${PROJECT_ROOT}/infoic_0.7.4.xml" \
+    git -C "$MINIPRO_SRC" show "${LEGACY_TAG}:infoic.xml" > "${WORK_DIR}/infoic_${LEGACY_TAG}.xml" \
         || fail "could not read infoic.xml at tag ${LEGACY_TAG} from external/minipro"
+    install_xml "${WORK_DIR}/infoic_${LEGACY_TAG}.xml" "${PROJECT_ROOT}/infoic_${LEGACY_TAG}.xml"
 }
 
 ensure_submodules
