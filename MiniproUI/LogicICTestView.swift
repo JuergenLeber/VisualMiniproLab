@@ -39,7 +39,11 @@ struct LogicICTestView: View {
                     .padding(20)
                     VStack {
                         if let logicICDetails = model.logicICDetails {
-                            DeviceDetailsView(expectLogicChip: true, deviceDetails: $model.logicICDetails)
+                            DeviceDetailsView(
+                                expectLogicChip: true,
+                                deviceDetails: $model.logicICDetails,
+                                programmerModel: model.programmerInfo?.model
+                            )
                             Button("Test") {
                                 Task {
                                     do {

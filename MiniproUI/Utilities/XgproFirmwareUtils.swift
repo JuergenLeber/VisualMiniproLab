@@ -30,7 +30,7 @@ private struct SoftwareBundleInfo {
     let checksum: String
 }
 
-public enum SoftwareBundleVerificationStatus {
+public enum SoftwareBundleVerificationStatus: String {
     case checksumMatch
     case checksumMismatch
     case programmerModelMismatch
