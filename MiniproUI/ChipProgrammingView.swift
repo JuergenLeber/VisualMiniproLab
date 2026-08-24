@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct ChipProgrammingView: View {
+    /// Keeps the chip list, the details and the banners from being squeezed
+    /// out of the window by the hex view next to them.
+    private static let sideColumnMinWidth: CGFloat = 340
+
     @ObservedObject var model: MiniproModel
     @State private var selectedDevice: String?
 
@@ -27,7 +31,7 @@ struct ChipProgrammingView: View {
                 HStack {
                     VStack {
                         BinaryDataView(data: $model.buffer)
-                            .frame(minWidth: 678)
+                            .frame(minWidth: 320, idealWidth: 678)
                         HStack {
                             OpenFileButton(caption: "Open File") { url in
                                 model.buffer = try Data(contentsOf: url)
@@ -62,6 +66,7 @@ struct ChipProgrammingView: View {
                             .formStyle(.grouped)
                             .padding(.top, 32)
                         }
+                        .frame(minWidth: Self.sideColumnMinWidth)
                     } else if model.programmerInfo == nil {
                         VStack {
                             Form {
@@ -70,6 +75,7 @@ struct ChipProgrammingView: View {
                             .formStyle(.grouped)
                             .padding(.top, 32)
                         }
+                        .frame(minWidth: Self.sideColumnMinWidth)
                     } else {
                         ZStack {
                             VStack {
@@ -96,6 +102,7 @@ struct ChipProgrammingView: View {
                                 Spacer()
                             }
                         }
+                        .frame(minWidth: Self.sideColumnMinWidth)
                     }
                 }
                 .padding()

@@ -19,5 +19,7 @@ struct MiniproUIApp: App {
         WindowGroup {
             ContentView()
         }
+        // Only applies to the first launch; after that the window frame is restored.
+        .defaultSize(width: 1500, height: 900)
     }
 }

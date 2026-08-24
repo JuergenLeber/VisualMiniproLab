@@ -14,7 +14,7 @@ struct BinaryDataView: View {
     var body: some View {
         VStack {
             if let data = data {
-                ScrollView(.vertical) {
+                ScrollView([.vertical, .horizontal]) {
                     LazyVStack(alignment: .leading, spacing: 2) {
                         ForEach(0..<numberOfLines(for: data), id: \.self) { line in
                             let startIndex = line * bytesPerLine
