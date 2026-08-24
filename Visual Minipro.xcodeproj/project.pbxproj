@@ -152,6 +152,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A13787E2D3A0901006F0165 /* Build configuration list for PBXNativeTarget "Visual Minipro" */;
 			buildPhases = (
+				5AD0DEB12F0000010000E505 /* Prepare minipro dependencies */,
 				5A440F1A2E63C62700E505A5 /* ShellScript */,
 				5A1378552D3A0900006F0165 /* Sources */,
 				5A1378562D3A0900006F0165 /* Frameworks */,
@@ -291,6 +292,31 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5AD0DEB12F0000010000E505 /* Prepare minipro dependencies */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Scripts/prepare-deps.sh",
+			);
+			name = "Prepare minipro dependencies";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/minipro",
+				"$(SRCROOT)/libusb-1.0.0.dylib",
+				"$(SRCROOT)/infoic.xml",
+				"$(SRCROOT)/infoic_0.7.4.xml",
+				"$(SRCROOT)/logicic.xml",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Scripts/prepare-deps.sh\"\n";
+		};
 		5A440F1A2E63C62700E505A5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;

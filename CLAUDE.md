@@ -10,6 +10,14 @@ Visual Minipro is a macOS SwiftUI app for XGecu programmers. The Xcode project i
 - Unit tests: `MiniproUITests/`
 - UI tests: `MiniproUIUITests/`
 
+## Dependencies
+`minipro` and `libusb` are git submodules under `external/`. `Scripts/prepare-deps.sh` builds them and
+places `minipro`, `libusb-1.0.0.dylib`, `infoic.xml`, `infoic_0.7.4.xml`, and `logicic.xml` at the
+repository root, where the Xcode project picks them up (all five are git-ignored). The
+`Prepare minipro dependencies` build phase runs it first on every build and exits early when the
+submodules have not moved. Run it by hand with `--force` after changing the script, `--arch <arch>` to
+build a single slice. It needs `autoconf`, `automake`, `libtool`, and `pkg-config` from Homebrew.
+
 ## Build
 ```
 xcodebuild -project "Visual Minipro.xcodeproj" -scheme "Visual Minipro" -configuration Debug build

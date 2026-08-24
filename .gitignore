@@ -64,6 +64,9 @@ fastlane/test_output
 
 # Misc
 .DS_Store
+
+# Dependencies built by Scripts/prepare-deps.sh from the submodules in external/
+/.deps/
 /minipro
 /minipro_rel
 /minipro_debug
