@@ -9,14 +9,32 @@ TL866A, TL866CS, TL866II+, T48, T56 and T76 programmers.
 
 ## Features
 
-### Read and write EEPROM contents
-https://github.com/user-attachments/assets/223b87c6-2a22-45dd-a9f9-31aff44f878b
+- Read and write EEPROM contents
+- Test 74xx/40xx logic ICs
+- Update your programmer's firmware
 
-### Test 74xx/40xx logic ICs
-https://github.com/user-attachments/assets/52823ef8-a25e-41ad-b4cd-3f83759363ea
+## Added in this fork
 
-### Update your programmer's firmware
-https://github.com/user-attachments/assets/8b3be8b0-840e-4e8d-b0e7-947bf6cc8379
+### See where the chip goes in the socket
+
+The chip details now show how to place the chip, the way the original Xgpro software does:
+
+- **Adapter and ICSP pictures.** Chips that need an adapter or in-circuit wiring show the picture for
+  the connected programmer, taken from the Xgpro software bundle you install for the algorithms. The
+  pictures stay on your Mac and are never redistributed with the app.
+- **A drawn *Location in Socket* diagram** for chips that have no picture: the chip sits at the bottom of
+  the ZIF socket with the notch pointing up, and the diagram names the socket pin the chip's pin 1 goes
+  in. PLCC chips and adapters are drawn through the footprint of the adapter they plug into, and the
+  adapter Xgpro asks for (for example `T76_F48_05-001`) is named below the diagram.
+
+A diagram is only drawn where the footprint is unambiguous. A PLCC44 chip, for instance, ships as both a
+PLCC44-DIP40 and a PLCC44-DIP44 adapter, so those chips keep showing the picture alone rather than a
+guess.
+
+### Building from source
+
+`minipro` and `libusb` are git submodules, built automatically by the Xcode project. See
+[How to build it](#how-to-build-it).
 
 ## How to build it
 
