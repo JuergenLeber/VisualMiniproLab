@@ -96,7 +96,7 @@ struct ProgrammerInfoView: View {
 }
 
 struct FirmwareUpdateSection: View {
-    private let firmwareHelpUrl = "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
+    private let firmwareHelpUrl = "https://gitlab.com/DavidGriffith/minipro-firmware"
 
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
@@ -125,7 +125,7 @@ struct FirmwareUpdateSection: View {
                 )
             }.disabled(firmwareUrl == nil)
             Link(
-                "Learn more about downloading firmware",
+                "Firmware files can be downloaded from the minipro-firmware repository",
                 destination: URL(string: firmwareHelpUrl)!
             )
             .help(firmwareHelpUrl)
@@ -348,7 +348,7 @@ struct UpdateFirmwareButton: View {
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
     @State private var progressMessage: String?
-    private let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "UpdateFirmwareButton")
+    private let logger = Logger(category: "UpdateFirmwareButton")
 
     private func installFirmware(using firmwareUrl: URL) async throws {
         progressUpdate = nil

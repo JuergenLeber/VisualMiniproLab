@@ -22,7 +22,7 @@ class ProcessInvoker {
         -> InvocationResult
     {
         return try await withCheckedThrowingContinuation { continuation in
-            let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "ProcessInvoker")
+            let logger = Logger(category: "ProcessInvoker")
             let executableName = executableURL.lastPathComponent
             queue.async {
                 do {

@@ -37,7 +37,7 @@ struct VisualMiniproInfoView: View {
                         }
                     ) {
                         Section {
-                            Text("To report issues or request new features, please open an issue on [GitHub](https://github.com/moozzyk/MiniproUI/issues/new).")
+                            Text("To report issues or request new features, please open an issue on [GitHub](https://github.com/JuergenLeber/VisualMinipro/issues/new).")
                         }
                     }
                 }

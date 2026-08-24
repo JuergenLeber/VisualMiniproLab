@@ -1,0 +1,21 @@
+//
+//  Base.xcconfig
+//  Visual Minipro
+//
+//  Project wide identity and signing. Override anything here in
+//  Config/Local.xcconfig, which is git-ignored - see Config/Local.xcconfig.example.
+//
+
+// Bundle identifiers are built from this, e.g. dev.leber.VisualMinipro. Apple
+// registers a bundle identifier to one team only, so distributing the app needs
+// an identifier of your own rather than the one upstream uses.
+ORG_IDENTIFIER = dev.leber
+
+// Ad-hoc signing ("Sign to Run Locally"): builds and runs on this Mac without a
+// developer account. Set DEVELOPMENT_TEAM and CODE_SIGN_STYLE in
+// Config/Local.xcconfig to sign with a real identity instead.
+DEVELOPMENT_TEAM =
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY[sdk=macosx*] = -
+
+#include? "Local.xcconfig"

@@ -76,6 +76,26 @@ git add external/minipro
 
 The next build rebuilds the dependencies automatically.
 
+### Signing and identity
+
+Local builds are ad-hoc signed and need no Apple Developer account. Identity and signing come from
+[`Config/Base.xcconfig`](Config/Base.xcconfig), so the bundle identifier is
+`$(ORG_IDENTIFIER).VisualMinipro`.
+
+To sign with your own account, copy `Config/Local.xcconfig.example` to `Config/Local.xcconfig` — that
+file is git-ignored — and fill in what you need:
+
+```
+ORG_IDENTIFIER = com.example
+DEVELOPMENT_TEAM = ABCDE12345
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY[sdk=macosx*] = Apple Development
+```
+
+Anything left out keeps the value from `Base.xcconfig`, and `xcodebuild DEVELOPMENT_TEAM=...` overrides
+both for one-off builds. Note that a bundle identifier belongs to a single Apple Developer team, so
+distributing the app requires an identifier of your own.
+
 ## License 
 
 Visual Minipro is available under the [GNU General Public License]([https://github.com/moozzyk/MiniproUI/blob/main/LICENSE) as it wraps the excellent [`minipro`](https://gitlab.com/DavidGriffith/minipro) tool released under GPL.

@@ -18,6 +18,16 @@ repository root, where the Xcode project picks them up (all five are git-ignored
 submodules have not moved. Run it by hand with `--force` after changing the script, `--arch <arch>` to
 build a single slice. It needs `autoconf`, `automake`, `libtool`, and `pkg-config` from Homebrew.
 
+## Signing and identity
+Identity and signing live in `Config/Base.xcconfig` (project level). `PRODUCT_BUNDLE_IDENTIFIER` is
+`$(ORG_IDENTIFIER).VisualMinipro`; builds are ad-hoc signed (`CODE_SIGN_IDENTITY = -`, manual style, no
+team) so they run locally without a developer account. `Config/Local.xcconfig` is an optional,
+git-ignored override included by `Base.xcconfig`. Do not put signing settings back on the targets - a
+target level setting beats the project level xcconfig.
+
+The `os.Logger` subsystem follows the bundle identifier via `Logger(category:)` in
+`MiniproUI/Utilities/Logging.swift`; never hardcode a subsystem.
+
 ## Build
 ```
 xcodebuild -project "Visual Minipro.xcodeproj" -scheme "Visual Minipro" -configuration Debug build

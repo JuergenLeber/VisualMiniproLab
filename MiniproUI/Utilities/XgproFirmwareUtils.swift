@@ -41,10 +41,7 @@ public enum SoftwareBundleVerificationStatus: String {
 class XgproFirmwareUtils {
     private static let t56FileName = "updatet56.dat"
     private static let t76FileName = "UpdateT76.Dat"
-    private static let logger = Logger(
-        subsystem: "com.3d-logic.visualminipro",
-        category: "XgproFirmwareUtils"
-    )
+    private static let logger = Logger(category: "XgproFirmwareUtils")
 
     private static let softwareInfo: [String: SoftwareBundleInfo] = [
         "xgpro_T76_V1303A.rar": SoftwareBundleInfo(

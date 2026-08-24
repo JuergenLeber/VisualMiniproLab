@@ -42,8 +42,7 @@ enum InvocationError: Error {
 }
 
 class MiniproInvoker {
-    private static let libusbLogger = Logger(
-        subsystem: "com.3d-logic.visualminipro", category: "libusb")
+    private static let libusbLogger = Logger(category: "libusb")
 
     public static func invoke(
         arguments: [String], stdinData: Data? = nil, onProgress: @escaping ((Data) -> Void) = ({ _ in })
@@ -51,7 +50,7 @@ class MiniproInvoker {
         async throws
         -> InvocationResult
     {
-        let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "MiniproInvoker")
+        let logger = Logger(category: "MiniproInvoker")
         guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro") else {
             logger.error("minipro executable not found")
             throw InvocationError.executableNotFound

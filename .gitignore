@@ -65,6 +65,9 @@ fastlane/test_output
 # Misc
 .DS_Store
 
+# Local signing and identity overrides
+/Config/Local.xcconfig
+
 # Dependencies built by Scripts/prepare-deps.sh from the submodules in external/
 /.deps/
 /minipro

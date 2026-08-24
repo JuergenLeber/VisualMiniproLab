@@ -17,10 +17,7 @@ struct ChipImage: Identifiable, Equatable, Hashable {
 }
 
 class XgproImageUtils {
-    private static let logger = Logger(
-        subsystem: "com.3d-logic.visualminipro",
-        category: "XgproImageUtils"
-    )
+    private static let logger = Logger(category: "XgproImageUtils")
 
     // minipro reports adapters and ICSP connections as the name of the image
     // Xgpro would show, e.g. "Adapter001.JPG" or "ICP009.JPG". See

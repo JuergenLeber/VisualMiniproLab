@@ -1,0 +1,18 @@
+//
+//  Local.xcconfig.example
+//  Visual Minipro
+//
+//  Copy to Config/Local.xcconfig and fill in your own values. That file is
+//  git-ignored, so your team ID stays out of the repository.
+//
+
+// Your reverse-DNS prefix. The app becomes $(ORG_IDENTIFIER).VisualMinipro.
+// ORG_IDENTIFIER = com.example
+
+// Your 10 character Apple Developer team ID, from
+// https://developer.apple.com/account under Membership details.
+// DEVELOPMENT_TEAM = ABCDE12345
+
+// Let Xcode manage certificates and profiles for that team.
+// CODE_SIGN_STYLE = Automatic
+// CODE_SIGN_IDENTITY[sdk=macosx*] = Apple Development
