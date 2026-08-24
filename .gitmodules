@@ -1,0 +1,7 @@
+[submodule "external/minipro"]
+	path = external/minipro
+	url = https://gitlab.com/DavidGriffith/minipro.git
+	branch = master
+[submodule "external/libusb"]
+	path = external/libusb
+	url = https://github.com/libusb/libusb.git
