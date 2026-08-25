@@ -41,7 +41,12 @@ struct DeviceDetailsView: View {
                 }
             }
             .formStyle(.grouped)
-            .frame(height: computeHeight(illustrationCount: illustrations.count))
+            // A fixed height would push the window taller when a chip brings
+            // illustrations along; the form scrolls instead when space is tight.
+            .frame(
+                minHeight: Self.minimumHeight,
+                maxHeight: computeHeight(illustrationCount: illustrations.count)
+            )
         }
         .sheet(item: $enlargedItem) { illustration in
             ModalDialogView {
@@ -63,6 +68,9 @@ struct DeviceDetailsView: View {
             .map { ChipIllustration.placement($0) }
         return photos + (placement.map { [$0] } ?? [])
     }
+
+    /// Enough for the property rows; anything past that scrolls.
+    private static let minimumHeight: CGFloat = 200
 
     private func computeHeight(illustrationCount: Int) -> CGFloat {
         if let deviceDetails = deviceDetails {

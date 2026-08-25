@@ -58,7 +58,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5A1378592D3A0900006F0165 /* Visual Minipro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Visual Minipro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A1378592D3A0900006F0165 /* Visual Minipro Lab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Visual Minipro Lab.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A13786A2D3A0901006F0165 /* MiniproUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniproUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A1378742D3A0901006F0165 /* MiniproUIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniproUIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A559C9E2D3F3F60000A364C /* logicic.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = logicic.xml; sourceTree = "<group>"; };
@@ -133,7 +133,7 @@
 		5A13785A2D3A0900006F0165 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5A1378592D3A0900006F0165 /* Visual Minipro.app */,
+				5A1378592D3A0900006F0165 /* Visual Minipro Lab.app */,
 				5A13786A2D3A0901006F0165 /* MiniproUITests.xctest */,
 				5A1378742D3A0901006F0165 /* MiniproUIUITests.xctest */,
 			);
@@ -184,7 +184,7 @@
 			packageProductDependencies = (
 			);
 			productName = MiniproUI;
-			productReference = 5A1378592D3A0900006F0165 /* Visual Minipro.app */;
+			productReference = 5A1378592D3A0900006F0165 /* Visual Minipro Lab.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5A1378692D3A0901006F0165 /* MiniproUITests */ = {
@@ -305,27 +305,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5AD0DEB12F0000020000E505 /* Sign minipro */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Scripts/sign-minipro.sh",
-				"$(SRCROOT)/minipro.entitlements",
-			);
-			name = "Sign minipro";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Scripts/sign-minipro.sh\"\n";
-		};
 		5A440F1A2E63C62700E505A5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -368,6 +347,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"$SRCROOT/Scripts/prepare-deps.sh\"\n";
+		};
+		5AD0DEB12F0000020000E505 /* Sign minipro */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Scripts/sign-minipro.sh",
+				"$(SRCROOT)/minipro.entitlements",
+			);
+			name = "Sign minipro";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Scripts/sign-minipro.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -649,7 +649,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = MiniproUI;
+				TEST_TARGET_NAME = "Visual Minipro";
 			};
 			name = Debug;
 		};
@@ -664,7 +664,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = MiniproUI;
+				TEST_TARGET_NAME = "Visual Minipro";
 			};
 			name = Release;
 		};
