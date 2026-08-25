@@ -11,6 +11,11 @@ struct ChipProgrammingView: View {
     /// Keeps the chip list, the details and the banners from being squeezed
     /// out of the window by the hex view next to them.
     private static let sideColumnMinWidth: CGFloat = 340
+    /// What the three columns need side by side: the hex view at its narrowest,
+    /// the read and write buttons, the column above, and the padding around
+    /// them. Stated so the window cannot shrink past it and let the columns
+    /// spill out from under the sidebar.
+    private static let contentMinWidth: CGFloat = 320 + 80 + sideColumnMinWidth + 40
 
     @ObservedObject var model: MiniproModel
     @State private var selectedDevice: String?
@@ -109,6 +114,7 @@ struct ChipProgrammingView: View {
                 Spacer()
             }
         }
+        .frame(minWidth: Self.contentMinWidth)
         .task {
             model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
             if let programmerInfo = model.programmerInfo {
