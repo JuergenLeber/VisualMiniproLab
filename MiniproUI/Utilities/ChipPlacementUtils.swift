@@ -28,6 +28,9 @@ struct ChipPlacement: Equatable, Hashable {
 class ChipPlacementUtils {
     private static let dipPackage = /^DIP([0-9]+)$/
     private static let plccPackage = /^PLCC([0-9]+)$/
+    /// A package in a device name is letters followed by pins: DIP28, SON8,
+    /// TSOP48. Markers like the "OC" of 7406@OC are not packages.
+    private static let packageLikeSuffix = /^[A-Za-z]+[0-9]+/
 
     /// Xgpro's PLCC adapters, as named in the Xgpro executable. PLCC44 is left
     /// out: it ships as both a PLCC44-DIP40 and a PLCC44-DIP44 adapter, so the
@@ -98,10 +101,14 @@ class ChipPlacementUtils {
     /// ACE25AC512G@SON8 is "DIP8". Those go on an adapter this cannot identify,
     /// so only go ahead when the device name carries the same package.
     static func packageMatchesDeviceName(_ packageValue: String, deviceName: String) -> Bool {
-        guard let packageSuffix = deviceName.split(separator: "@").dropFirst().last else {
-            // Logic ICs and the like carry no package in their name.
-            return dipPinCount(from: packageValue) != nil
+        guard
+            let deviceSuffix = deviceName.split(separator: "@").dropFirst().last,
+            String(deviceSuffix).contains(packageLikeSuffix)
+        else {
+            // No package in the name: logic ICs, and variant markers such as
+            // the open collector 7406@OC. Go by what minipro reports.
+            return true
         }
-        return packageSuffix.uppercased() == packageValue.uppercased()
+        return deviceSuffix.uppercased() == packageValue.uppercased()
     }
 }

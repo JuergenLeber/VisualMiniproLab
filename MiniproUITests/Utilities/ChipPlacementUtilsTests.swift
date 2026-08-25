@@ -95,6 +95,16 @@ struct ChipPlacementUtilsTests {
         )
     }
 
+    @Test func placesLogicIcWithAVariantMarker() {
+        // 7406@OC is an open collector 7406, not a chip in an "OC" package.
+        #expect(
+            ChipPlacementUtils.placement(
+                for: Self.deviceDetails(name: "7406@OC", package: "DIP14"),
+                programmerModel: .t76
+            ) == ChipPlacement(pinCount: 14, socketPinCount: 48)
+        )
+    }
+
     @Test func skipsSurfaceMountChipsReportedAsDip() {
         // ACE25AC512G@SON8 reports "DIP8" but goes on an adapter.
         #expect(
