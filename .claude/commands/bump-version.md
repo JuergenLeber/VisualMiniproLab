@@ -1,4 +1,9 @@
-Bump the Visual Minipro Lab version by incrementing the patch number, commit, and tag.
+---
+argument-hint: "[version]"
+---
+
+Bump the Visual Minipro Lab version, commit, and tag. Without an argument the patch number is
+incremented; `$ARGUMENTS` sets the version explicitly, e.g. `/bump-version 2.0.0`.
 
 ## Step 1: Read the current version
 
@@ -15,8 +20,11 @@ grep "CURRENT_PROJECT_VERSION\|MARKETING_VERSION" "Visual Minipro.xcodeproj/proj
 Only look at the first two occurrences of each — they are the Debug and Release configs for the main app target. The other occurrences belong to test targets and should not be changed.
 
 Compute:
-- `new_version`: increment the patch component by 1 (e.g. `1.5.5` → `1.5.6`)
-- `new_build`: increment `CURRENT_PROJECT_VERSION` by 1 (e.g. `13` → `14`)
+- `new_version`: `$ARGUMENTS` when one was given, otherwise the current version with its patch
+  component incremented by 1 (e.g. `1.5.5` → `1.5.6`). A given version must be three numbers separated
+  by dots and must be higher than the current one - stop and say so if it is not.
+- `new_build`: increment `CURRENT_PROJECT_VERSION` by 1 (e.g. `13` → `14`), whichever way the version
+  was determined. App Store Connect rejects a build number that does not climb.
 
 ## Step 2: Update the project file
 
