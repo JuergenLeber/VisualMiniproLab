@@ -23,4 +23,11 @@ DEVELOPMENT_TEAM =
 CODE_SIGN_STYLE = Manual
 CODE_SIGN_IDENTITY[sdk=macosx*] = -
 
+// Hardened runtime turns on library validation, which only lets the app load
+// libraries signed by the same team. An ad-hoc signature has no team, so the
+// embedded libusb cannot be loaded and the app dies at launch. Distribution
+// builds sign everything with one team and need this on - turn it on in
+// Config/Local.xcconfig together with DEVELOPMENT_TEAM.
+ENABLE_HARDENED_RUNTIME = NO
+
 #include? "Local.xcconfig"

@@ -16,3 +16,8 @@
 // Let Xcode manage certificates and profiles for that team.
 // CODE_SIGN_STYLE = Automatic
 // CODE_SIGN_IDENTITY[sdk=macosx*] = Apple Development
+
+// Required for notarization, and safe once a real team signs the app, the
+// embedded minipro and libusb: they then share a team ID, which is what
+// library validation checks. Leave it off for ad-hoc builds.
+// ENABLE_HARDENED_RUNTIME = YES

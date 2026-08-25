@@ -94,7 +94,9 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Apple Development
 ```
 
 Anything left out keeps the value from `Base.xcconfig`, and `xcodebuild DEVELOPMENT_TEAM=...` overrides
-both for one-off builds. Note that a bundle identifier belongs to a single Apple Developer team, so
+both for one-off builds. Turn `ENABLE_HARDENED_RUNTIME` on there as well: it is required for
+notarization, and it can only be used once a real team signs the app and everything embedded in it,
+because it makes macOS refuse libraries whose team differs from the app's. Note that a bundle identifier belongs to a single Apple Developer team, so
 distributing the app requires an identifier of your own.
 
 ## License 
