@@ -1,4 +1,4 @@
-Bump the Visual Minipro version by incrementing the patch number, commit, and tag.
+Bump the Visual Minipro Lab version by incrementing the patch number, commit, and tag.
 
 ## Step 1: Read the current version
 
@@ -30,12 +30,12 @@ Verify the changes:
 grep -n "CURRENT_PROJECT_VERSION\|MARKETING_VERSION" "Visual Minipro.xcodeproj/project.pbxproj"
 ```
 
-Confirm the main target configs (lines ~486 and ~524) are updated and the test target configs are unchanged.
+Confirm the first two occurrences of each are updated and the test target configs are unchanged.
 
 ## Step 3: Commit
 
 ```bash
-git add -A && git commit -m "Bump version to <new_version>"
+git add -A && git commit -m "chore: bump version to <new_version>"
 ```
 
 ## Step 4: Tag
