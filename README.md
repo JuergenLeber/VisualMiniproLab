@@ -1,11 +1,11 @@
-<img align="right" width="64" height="64" alt="icon_1024" src="https://github.com/user-attachments/assets/5a887d1f-420f-49a9-929d-f6f47c526bfc" />
+<img align="right" width="64" height="64" alt="Visual Minipro Lab icon" src="MiniproUI/Assets.xcassets/MiniproUIIcon.appiconset/icon_256.png" />
 
-# Visual Minipro
+# Visual Minipro Lab
 
 The missing Mac OS app for [XGecu](http://www.xgecu.com/en/) programmers. 
 
-This is a fork of [Visual Minipro](https://github.com/moozzyk/MiniproUI) by Pawel Kadluczka. It supports the
-TL866A, TL866CS, TL866II+, T48, T56 and T76 programmers.
+Visual Minipro Lab is a fork of [Visual Minipro](https://github.com/moozzyk/MiniproUI) by Pawel Kadluczka.
+It supports the TL866A, TL866CS, TL866II+, T48, T56 and T76 programmers.
 
 ## Features
 
@@ -38,7 +38,7 @@ guess.
 
 ## How to build it
 
-You can build the app yourself from this repository. Visual Minipro bundles the
+You can build the app yourself from this repository. Visual Minipro Lab bundles the
 [`minipro`](https://gitlab.com/DavidGriffith/minipro) tool and its
 [`libusb`](https://github.com/libusb/libusb) dependency, both of which are git submodules under `external/`
 and are built by `Scripts/prepare-deps.sh`.
@@ -78,9 +78,10 @@ The next build rebuilds the dependencies automatically.
 
 ### Signing and identity
 
-Local builds are ad-hoc signed and need no Apple Developer account. Identity and signing come from
-[`Config/Base.xcconfig`](Config/Base.xcconfig), so the bundle identifier is
-`$(ORG_IDENTIFIER).VisualMinipro`.
+Local builds are ad-hoc signed and need no Apple Developer account. Identity, the app name and signing
+come from [`Config/Base.xcconfig`](Config/Base.xcconfig): the app is named `$(APP_PRODUCT_NAME)` and its
+bundle identifier is `$(ORG_IDENTIFIER).VisualMiniproLab`. The Xcode target and the Swift module stay
+`Visual Minipro`, which is why the build commands above use that scheme name.
 
 To sign with your own account, copy `Config/Local.xcconfig.example` to `Config/Local.xcconfig` — that
 file is git-ignored — and fill in what you need:
@@ -98,4 +99,4 @@ distributing the app requires an identifier of your own.
 
 ## License 
 
-Visual Minipro is available under the [GNU General Public License]([https://github.com/moozzyk/MiniproUI/blob/main/LICENSE) as it wraps the excellent [`minipro`](https://gitlab.com/DavidGriffith/minipro) tool released under GPL.
+Visual Minipro Lab is available under the [GNU General Public License](LICENSE) as it wraps the excellent [`minipro`](https://gitlab.com/DavidGriffith/minipro) tool released under GPL.

@@ -11,6 +11,11 @@
 // an identifier of your own rather than the one upstream uses.
 ORG_IDENTIFIER = dev.leber
 
+// The name of the app bundle and what the user sees in the Dock and menu bar.
+// The target and the Swift module stay "Visual Minipro", so tests keep importing
+// Visual_Minipro.
+APP_PRODUCT_NAME = Visual Minipro Lab
+
 // Ad-hoc signing ("Sign to Run Locally"): builds and runs on this Mac without a
 // developer account. Set DEVELOPMENT_TEAM and CODE_SIGN_STYLE in
 // Config/Local.xcconfig to sign with a real identity instead.

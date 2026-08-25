@@ -1,7 +1,9 @@
 # CLAUDE.md
 
 ## Project overview
-Visual Minipro is a macOS SwiftUI app for XGecu programmers. The Xcode project is `Visual Minipro.xcodeproj` and the main target is **Visual Minipro**.
+Visual Minipro Lab is a macOS SwiftUI app for XGecu programmers, forked from Pawel Kadluczka's Visual Minipro. The Xcode project is `Visual Minipro.xcodeproj` and the main target is **Visual Minipro**.
+
+The shipped app is named **Visual Minipro Lab** (`APP_PRODUCT_NAME` in `Config/Base.xcconfig`), while the target, the scheme and the Swift module stay `Visual Minipro` - `PRODUCT_MODULE_NAME` is pinned so tests keep importing `Visual_Minipro`.
 
 ## Key paths
 - App sources: `MiniproUI/`
@@ -27,6 +29,10 @@ target level setting beats the project level xcconfig.
 
 The `os.Logger` subsystem follows the bundle identifier via `Logger(category:)` in
 `MiniproUI/Utilities/Logging.swift`; never hardcode a subsystem.
+
+The embedded `minipro` helper is re-signed by the `Sign minipro` build phase (`Scripts/sign-minipro.sh`)
+with `minipro.entitlements`, so it inherits the app's sandbox and its USB access. That phase must stay
+last, after `Embed minipro` and before Xcode signs the app bundle.
 
 ## Build
 ```

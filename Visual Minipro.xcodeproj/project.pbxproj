@@ -171,6 +171,7 @@
 				5A1378572D3A0900006F0165 /* Resources */,
 				5A75B9AF2D3CE06900DF9FA7 /* Embed minipro */,
 				5A75B9B62D3CEAE900DF9FA7 /* Embed Libraries */,
+				5AD0DEB12F0000020000E505 /* Sign minipro */,
 			);
 			buildRules = (
 			);
@@ -304,6 +305,27 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5AD0DEB12F0000020000E505 /* Sign minipro */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Scripts/sign-minipro.sh",
+				"$(SRCROOT)/minipro.entitlements",
+			);
+			name = "Sign minipro";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Scripts/sign-minipro.sh\"\n";
+		};
 		5A440F1A2E63C62700E505A5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -539,8 +561,9 @@
 					"$(PROJECT_DIR)",
 				);
 				MARKETING_VERSION = 1.5.8;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(ORG_IDENTIFIER).VisualMinipro";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(ORG_IDENTIFIER).VisualMiniproLab";
+				PRODUCT_MODULE_NAME = Visual_Minipro;
+				PRODUCT_NAME = "$(APP_PRODUCT_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -575,8 +598,9 @@
 				);
 				MARKETING_VERSION = 1.5.8;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(ORG_IDENTIFIER).VisualMinipro";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(ORG_IDENTIFIER).VisualMiniproLab";
+				PRODUCT_MODULE_NAME = Visual_Minipro;
+				PRODUCT_NAME = "$(APP_PRODUCT_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -595,7 +619,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Visual Minipro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Visual Minipro";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/$(APP_PRODUCT_NAME).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/$(APP_PRODUCT_NAME)";
 			};
 			name = Debug;
 		};
@@ -612,7 +636,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Visual Minipro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Visual Minipro";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/$(APP_PRODUCT_NAME).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/$(APP_PRODUCT_NAME)";
 			};
 			name = Release;
 		};

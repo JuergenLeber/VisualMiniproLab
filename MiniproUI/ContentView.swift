@@ -12,7 +12,7 @@ enum ViewType: String, Hashable, CaseIterable {
     case logicIcTest = "Logic IC Test"
     case programmerInfo = "Programmer Info"
     case settings = "Settings"
-    case visualMiniproInfo = "About Visual Minipro"
+    case visualMiniproInfo = "About Visual Minipro Lab"
 }
 
 class MiniproModel: ObservableObject {

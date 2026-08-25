@@ -14,14 +14,14 @@ struct VisualMiniproInfoView: View {
         ZStack {
             VStack(alignment: .leading, spacing: 16) {
                 TabHeaderView(
-                    caption: "About Visual Minipro",
+                    caption: "About Visual Minipro Lab",
                     secondaryCaption: "Version: \(visualMiniproInfo?.version ?? "")",
                     systemImageName: "macwindow.and.cursorarrow")
                 Form {
                     Section(
                         header: HStack {
                             Image("VisualMiniproIconImage")
-                            Text("About Visual Minipro")
+                            Text("About Visual Minipro Lab")
                         }
                     ) {
                         Section {
