@@ -24,7 +24,6 @@ struct ChipPlacementView: View {
     }
 
     private func draw(in context: GraphicsContext, size: CGSize) {
-        var context = context
         let socketWidth = size.width
         let socketRect = CGRect(x: 0, y: 0, width: socketWidth, height: size.height)
         let rowHeight = socketRect.height / CGFloat(placement.socketRows + 2)
