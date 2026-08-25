@@ -34,6 +34,12 @@ The embedded `minipro` helper is re-signed by the `Sign minipro` build phase (`S
 with `minipro.entitlements`, so it inherits the app's sandbox and its USB access. That phase must stay
 last, after `Embed minipro` and before Xcode signs the app bundle.
 
+## App icon
+`Design/AppIcon-base-1024.png` is the socket artwork without the Lab badge. `Scripts/make-app-icon.swift`
+draws the badge onto it and rewrites every size in `MiniproUIIcon.appiconset` and
+`VisualMiniproIconImage.imageset`; run it after changing either. Never edit the generated PNGs by hand,
+and keep the base file free of the badge.
+
 ## Build
 ```
 xcodebuild -project "Visual Minipro.xcodeproj" -scheme "Visual Minipro" -configuration Debug build
