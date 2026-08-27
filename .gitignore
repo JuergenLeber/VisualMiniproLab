@@ -78,6 +78,9 @@ infoic*.xml
 logicic.xml
 /misc
 
+# Disk images built by Scripts/make-dmg.sh
+/dist/
+
 MiniproUI/BuildInfo.swift
 x86_64
 arm64

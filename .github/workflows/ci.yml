@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    # The version bump tags bare versions; accept a v prefix as well.
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-*"
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+env:
+  PROJECT: Visual Minipro.xcodeproj
+  SCHEME: Visual Minipro
+
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: macos-15
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          # external/minipro and external/libusb are what prepare-deps.sh builds.
+          submodules: recursive
+          # The BuildInfo.swift build phase records the commit and its date.
+          fetch-depth: 0
+
+      - name: Show toolchain
+        run: xcodebuild -version
+
+      - uses: ./.github/actions/minipro-deps
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -derivedDataPath build
+
+      - name: Analyze
+        run: |
+          xcodebuild analyze \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -derivedDataPath build
+
+  release:
+    name: Release
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: macos-15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # A prerelease tag carries a suffix the project file never has.
+          project_version=$(sed -n 's/.*MARKETING_VERSION = \([0-9.]*\);.*/\1/p' \
+            "$PROJECT/project.pbxproj" | head -1)
+          if [ "${version%%-*}" != "$project_version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match MARKETING_VERSION" \
+              "$project_version - bump the version before tagging"
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+          case "$version" in
+            *-*) echo "prerelease=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - uses: ./.github/actions/minipro-deps
+
+      - name: Build the app
+        run: |
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -derivedDataPath build \
+            ARCHS="arm64 x86_64" \
+            ONLY_ACTIVE_ARCH=NO
+
+      - name: Check the app bundle
+        run: |
+          app="build/Build/Products/Release/Visual Minipro Lab.app"
+          [ -d "$app" ] || { echo "::error::no app at $app"; exit 1; }
+          lipo -archs "$app/Contents/MacOS/Visual Minipro Lab"
+          # Ad-hoc signatures still have to be intact, or Gatekeeper refuses the
+          # app outright instead of letting the user approve it.
+          codesign --verify --deep --strict --verbose=2 "$app"
+
+      - name: Build the disk image
+        run: |
+          ./Scripts/make-dmg.sh \
+            --app "build/Build/Products/Release/Visual Minipro Lab.app" \
+            --version "${{ steps.version.outputs.value }}"
+
+      - name: Write the release notes
+        run: |
+          cat > release-notes.md <<'NOTES'
+          ## Installing
+
+          Open the disk image and drag **Visual Minipro Lab** to your Applications folder.
+
+          This build is **ad-hoc signed and not notarized**, so macOS will refuse to open it
+          on the first try. Approve it once, either way round:
+
+          - Right-click the app in Finder, choose **Open**, then **Open** again in the dialog; or
+          - open **System Settings → Privacy & Security** and click **Open Anyway**.
+
+          If macOS still refuses, clear the quarantine flag and try again:
+
+          ```
+          xattr -dr com.apple.quarantine "/Applications/Visual Minipro Lab.app"
+          ```
+
+          Universal build for Apple silicon and Intel, macOS 14.6 or later.
+          NOTES
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/VisualMiniproLab-${{ steps.version.outputs.value }}.dmg" \
+            --title "Visual Minipro Lab ${{ steps.version.outputs.value }}" \
+            --notes-file release-notes.md \
+            --generate-notes \
+            --prerelease=${{ steps.version.outputs.prerelease }}

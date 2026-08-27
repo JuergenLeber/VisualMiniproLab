@@ -51,6 +51,15 @@ xcodebuild -project "Visual Minipro.xcodeproj" -scheme "Visual Minipro" test
 ```
 UI tests require a simulator. Unit tests do not.
 
+## CI and releases
+`.github/workflows/ci.yml` builds and analyzes the app on every push and pull request. Pushing a version
+tag (`2.0.0` or `v2.0.0`, matching `MARKETING_VERSION` - the workflow fails if it does not) also builds a
+universal Release app, packs it with `Scripts/make-dmg.sh`, and publishes a GitHub release with the disk
+image attached. Releases carry the ad-hoc signature, so users approve the app once on first launch.
+
+`.github/actions/minipro-deps` builds the submodule dependencies universal and caches them on the two
+submodule commits plus the hash of `prepare-deps.sh`; the in-Xcode build phase then exits early.
+
 ## Architecture
 The app is layered:
 

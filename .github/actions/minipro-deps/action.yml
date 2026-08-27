@@ -1,0 +1,47 @@
+name: Build minipro dependencies
+description: >-
+  Build (or restore from cache) the minipro CLI, libusb and the device
+  databases that Scripts/prepare-deps.sh drops at the repository root.
+
+runs:
+  using: composite
+  steps:
+    - name: Install autotools
+      shell: bash
+      run: |
+        # The runner image ships most of these; only pay for what is missing.
+        command -v autoreconf >/dev/null || brew install autoconf
+        command -v aclocal >/dev/null || brew install automake
+        command -v glibtoolize >/dev/null || brew install libtool
+        command -v pkg-config >/dev/null || brew install pkgconf
+
+    - name: Compute dependency cache key
+      id: key
+      shell: bash
+      run: |
+        # The same inputs prepare-deps.sh stamps: the two submodule commits and
+        # the script itself. Anything else moving cannot change its output.
+        minipro=$(git rev-parse HEAD:external/minipro)
+        libusb=$(git rev-parse HEAD:external/libusb)
+        script=$(shasum -a 256 Scripts/prepare-deps.sh | cut -c1-16)
+        echo "value=minipro-deps-${minipro}-${libusb}-${script}" >> "$GITHUB_OUTPUT"
+
+    - name: Restore dependencies
+      uses: actions/cache@v4
+      with:
+        # .deps/stamp is what makes prepare-deps.sh skip the rebuild; the rest
+        # of .deps is the throwaway build tree and is not worth carrying.
+        path: |
+          .deps/stamp
+          minipro
+          libusb-1.0.0.dylib
+          infoic.xml
+          infoic_0.7.4.xml
+          logicic.xml
+        key: ${{ steps.key.outputs.value }}
+
+    - name: Build dependencies
+      shell: bash
+      # Always universal, whatever the job goes on to build, so both jobs hit
+      # the same cache entry and the in-Xcode build phase then exits early.
+      run: ./Scripts/prepare-deps.sh --arch arm64 --arch x86_64

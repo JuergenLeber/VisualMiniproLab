@@ -2,6 +2,8 @@
 
 # Visual Minipro Lab
 
+[![CI](https://github.com/JuergenLeber/VisualMinipro/actions/workflows/ci.yml/badge.svg)](https://github.com/JuergenLeber/VisualMinipro/actions/workflows/ci.yml)
+
 The missing Mac OS app for [XGecu](http://www.xgecu.com/en/) programmers. 
 
 Visual Minipro Lab is a fork of [Visual Minipro](https://github.com/moozzyk/MiniproUI) by Pawel Kadluczka.
@@ -98,6 +100,21 @@ both for one-off builds. Turn `ENABLE_HARDENED_RUNTIME` on there as well: it is 
 notarization, and it can only be used once a real team signs the app and everything embedded in it,
 because it makes macOS refuse libraries whose team differs from the app's. Note that a bundle identifier belongs to a single Apple Developer team, so
 distributing the app requires an identifier of your own.
+
+### Continuous integration and releases
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) builds and analyzes the app on every push and
+pull request, on a macOS runner. The `minipro` dependencies are built there the same way, universal, and
+cached on the two submodule commits so only a submodule bump pays for a rebuild.
+
+Pushing a version tag (`2.0.0`, or `v2.0.0`) additionally builds a universal Release app, packs it into
+a disk image with [`Scripts/make-dmg.sh`](Scripts/make-dmg.sh), and publishes a GitHub release with that
+image attached. The tag has to match `MARKETING_VERSION` in the project, which is what the version bump
+sets, and the workflow stops if it does not.
+
+Those builds carry the repository's ad-hoc signature: they are not signed with a Developer ID and not
+notarized, so macOS refuses to open the app until it is approved once, either through Finder's
+right-click **Open** or in **System Settings → Privacy & Security**. The release notes say so.
 
 ## License 
 
