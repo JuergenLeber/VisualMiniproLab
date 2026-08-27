@@ -33,6 +33,12 @@ jobs:
           # The BuildInfo.swift build phase records the commit and its date.
           fetch-depth: 0
 
+      - name: Generate build info
+        # MiniproUI is a synchronized folder group, so the git-ignored
+        # BuildInfo.swift has to exist before xcodebuild reads the project - the
+        # build phase that writes it would come too late on a fresh clone.
+        run: ./Scripts/make-build-info.sh
+
       - name: Show toolchain
         run: xcodebuild -version
 
@@ -85,6 +91,12 @@ jobs:
             *-*) echo "prerelease=true" >> "$GITHUB_OUTPUT" ;;
             *) echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
           esac
+
+      - name: Generate build info
+        # MiniproUI is a synchronized folder group, so the git-ignored
+        # BuildInfo.swift has to exist before xcodebuild reads the project - the
+        # build phase that writes it would come too late on a fresh clone.
+        run: ./Scripts/make-build-info.sh
 
       - uses: ./.github/actions/minipro-deps
 

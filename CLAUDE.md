@@ -40,6 +40,14 @@ draws the badge onto it and rewrites every size in `MiniproUIIcon.appiconset` an
 `VisualMiniproIconImage.imageset`; run it after changing either. Never edit the generated PNGs by hand,
 and keep the base file free of the badge.
 
+## Generated build info
+`MiniproUI/BuildInfo.swift` holds the commit details the info screen shows. It is git-ignored and written
+by `Scripts/make-build-info.sh`, which the `Generate build info` build phase runs. `MiniproUI` is a
+synchronized folder group, so Xcode decides what to compile when it loads the project: on a clone that
+has never been built the file does not exist yet, the target is missing it, and the build fails on
+`getGitBranch` and friends however the build phase later writes it. Run the script once before the first
+build - CI does exactly that.
+
 ## Build
 ```
 xcodebuild -project "Visual Minipro.xcodeproj" -scheme "Visual Minipro" -configuration Debug build
