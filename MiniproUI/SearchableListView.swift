@@ -8,52 +8,52 @@
 import SwiftUI
 
 struct SearchableListView: View {
-    let items: [String]
-    @Binding var selectedItem: String?
+    let items: [ChipListItem]
+    @Binding var selectedItem: ChipListItem?
     @Binding var applyAdditionalFilter: Bool
-    @State var selectedListItem: String?
+    @State var selectedListItem: ChipListItem?
     @State var searchText: String = ""
     @State var shouldShowList = true
     let isCollapsible: Bool
-    let additionalFilter: (([String]) -> [String])?
+    let additionalFilter: (([ChipListItem]) -> [ChipListItem])?
     @Environment(\.colorScheme) private var colorScheme
 
-    init(items: [String], selectedItem: Binding<String?>, isCollapsible: Bool) {
+    init(items: [ChipListItem], selectedItem: Binding<ChipListItem?>, isCollapsible: Bool) {
         self.items = items
         self._selectedItem = selectedItem
         self._applyAdditionalFilter = .constant(false)
         self.isCollapsible = isCollapsible
         self.additionalFilter = nil
-        self._searchText = State(initialValue: selectedItem.wrappedValue ?? "")
+        self._searchText = State(initialValue: selectedItem.wrappedValue?.name ?? "")
         self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil || !isCollapsible)
     }
 
     init(
-        items: [String], selectedItem: Binding<String?>, applyAdditionalFilter: Binding<Bool>,
-        isCollapsible: Bool, additionalFilter: @escaping ([String]) -> [String]
+        items: [ChipListItem], selectedItem: Binding<ChipListItem?>, applyAdditionalFilter: Binding<Bool>,
+        isCollapsible: Bool, additionalFilter: @escaping ([ChipListItem]) -> [ChipListItem]
     ) {
         self.items = items
         self._selectedItem = selectedItem
         self._applyAdditionalFilter = applyAdditionalFilter
         self.isCollapsible = isCollapsible
         self.additionalFilter = additionalFilter
-        self._searchText = State(initialValue: selectedItem.wrappedValue ?? "")
+        self._searchText = State(initialValue: selectedItem.wrappedValue?.name ?? "")
         self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil || !isCollapsible)
     }
 
-    func prefilterItems() -> [String] {
+    func prefilterItems() -> [ChipListItem] {
         if additionalFilter != nil && applyAdditionalFilter {
             return additionalFilter!(items)
         }
         return items
     }
 
-    var filteredItems: [String] {
+    var filteredItems: [ChipListItem] {
         let prefilteredItems = self.prefilterItems()
         if searchText.isEmpty {
             return prefilteredItems
         } else {
-            return prefilteredItems.filter { $0.localizedCaseInsensitiveContains(searchText) }
+            return prefilteredItems.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
     }
 
@@ -81,9 +81,22 @@ struct SearchableListView: View {
             }
             if shouldShowList && filteredItems.count > 0 {
                 List(filteredItems, id: \.self, selection: $selectedListItem) { item in
-                    Text(item)
-                        .padding(.leading, 6)
-                        .listRowBackground(Color.clear)
+                    HStack(spacing: 12) {
+                        Text(item.name)
+                            .lineLimit(1)
+                        if let manufacturerLabel = item.manufacturerLabel {
+                            Spacer(minLength: 12)
+                            // The same name can come from several manufacturers
+                            // with different chip IDs, so the row has to say
+                            // which one it is.
+                            Text(manufacturerLabel)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    .padding(.leading, 6)
+                    .listRowBackground(Color.clear)
                 }
                 .listStyle(.plain)
                 .background(
@@ -103,14 +116,14 @@ struct SearchableListView: View {
             if selectedListItem != nil {
                 selectedItem = selectedListItem
                 if isCollapsible {
-                    searchText = selectedListItem ?? ""
+                    searchText = selectedListItem?.name ?? ""
                     shouldShowList = false
                     selectedListItem = nil
                 }
             }
         }.onChange(of: searchText) {
             if isCollapsible {
-                shouldShowList = shouldShowList || searchText != selectedItem
+                shouldShowList = shouldShowList || searchText != selectedItem?.name
             }
         }
     }
@@ -151,7 +164,7 @@ struct SearchBar: View {
 
 #Preview {
     SearchableListView(
-        items: ["apple", "orange", "banana"],
+        items: ["apple", "orange", "banana"].map { ChipListItem(name: $0, variant: nil) },
         selectedItem: .constant(nil),
         isCollapsible: false
     )

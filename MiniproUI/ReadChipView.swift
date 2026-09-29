@@ -18,6 +18,9 @@ struct ReadChipView: View {
     @Binding var isPresented: Bool
     @Binding var readOptions: ReadOptions
     @Binding var programmerInfo: ProgrammerInfo?
+    /// The database holding just the selected manufacturer's entry, if the chip
+    /// name needed one.
+    let infoicOverride: URL?
     @Binding var errorMessage: DialogErrorMessage?
     @State private var readChipState = ReadChipState.readOptions
     @State private var progressUpdate: ProgressUpdate?
@@ -30,6 +33,7 @@ struct ReadChipView: View {
         isPresented: Binding<Bool>,
         readOptions: Binding<ReadOptions>,
         programmerInfo: Binding<ProgrammerInfo?>,
+        infoicOverride: URL? = nil,
         errorMessage: Binding<DialogErrorMessage?>
     ) {
         self.device = device
@@ -37,6 +41,7 @@ struct ReadChipView: View {
         self._isPresented = isPresented
         self._readOptions = readOptions
         self._programmerInfo = programmerInfo
+        self.infoicOverride = infoicOverride
         self._errorMessage = errorMessage
         newReadOptions = readOptions.wrappedValue
     }
@@ -59,7 +64,8 @@ struct ReadChipView: View {
                                 let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
                                     programmerInfo: programmerInfo
                                 )
-                                let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo!.model)
+                                let infoicPath =
+                                    infoicOverride ?? InfoICUtils.resolveInfoICPath(for: programmerInfo!.model)
                                 buffer = try await MiniproAPI.read(
                                     device: device.name,
                                     algorithmXmlPath: algorithmXmlPath,

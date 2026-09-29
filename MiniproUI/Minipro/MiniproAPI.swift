@@ -31,10 +31,13 @@ class MiniproAPI {
         return try ProgrammerInfoProcessor.run(result)
     }
 
-    static func getSupportedDevices(infoicPath: URL) async throws -> SupportedDevices {
+    static func getSupportedDevices(infoicPath: URL, programmerModel: ProgrammerModel? = nil) async throws
+        -> SupportedDevices
+    {
         try await ensureProgrammerConnected()
         let result = try await MiniproInvoker.invoke(arguments: ["--list", "--infoic", infoicPath.path])
-        return try SupportedDevicesProcessor.run(result, infoicPath: infoicPath)
+        return try SupportedDevicesProcessor.run(
+            result, infoicPath: infoicPath, programmerModel: programmerModel)
     }
 
     static func getDeviceDetails(device: String, infoicPath: URL) async throws -> DeviceDetails {

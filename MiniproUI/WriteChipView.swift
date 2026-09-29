@@ -18,6 +18,9 @@ struct WriteChipView: View {
     @Binding var isPresented: Bool
     @Binding var writeOptions: WriteOptions
     @Binding var programmerInfo: ProgrammerInfo?
+    /// The database holding just the selected manufacturer's entry, if the chip
+    /// name needed one.
+    let infoicOverride: URL?
     @Binding var errorMessage: DialogErrorMessage?
     @State private var writeChipState = WriteChipState.writeOptions
     @State private var progressUpdate: ProgressUpdate?
@@ -30,6 +33,7 @@ struct WriteChipView: View {
         isPresented: Binding<Bool>,
         writeOptions: Binding<WriteOptions>,
         programmerInfo: Binding<ProgrammerInfo?>,
+        infoicOverride: URL? = nil,
         errorMessage: Binding<DialogErrorMessage?>
     ) {
         self.device = device
@@ -37,6 +41,7 @@ struct WriteChipView: View {
         self._isPresented = isPresented
         self._writeOptions = writeOptions
         self._programmerInfo = programmerInfo
+        self.infoicOverride = infoicOverride
         self._errorMessage = errorMessage
         newWriteOptions = writeOptions.wrappedValue
     }
@@ -59,7 +64,8 @@ struct WriteChipView: View {
                                 let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
                                     programmerInfo: programmerInfo
                                 )
-                                let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo!.model)
+                                let infoicPath =
+                                    infoicOverride ?? InfoICUtils.resolveInfoICPath(for: programmerInfo!.model)
                                 try await MiniproAPI.write(
                                     device: device.name,
                                     data: buffer,

@@ -8,14 +8,26 @@
 import Foundation
 
 struct SupportedDevices {
-    var logicICs: [String]
-    var eepromICs: [String]
+    let logicICs: [String]
+    let eepromICs: [String]
+    let catalog: ChipCatalog
+    /// The chip list rows: one per manufacturer variant of an EEPROM name.
+    let eepromChips: [ChipListItem]
+    let logicChips: [ChipListItem]
+
+    init(logicICs: [String], eepromICs: [String], catalog: ChipCatalog = .empty) {
+        self.logicICs = logicICs
+        self.eepromICs = eepromICs
+        self.catalog = catalog
+        self.eepromChips = ChipListItem.items(for: eepromICs, catalog: catalog)
+        // Logic ICs come from logicic.xml, which knows a single manufacturer.
+        self.logicChips = ChipListItem.items(for: logicICs, catalog: .empty)
+    }
 }
 
 class SupportedDevicesProcessor {
-    private static func getICNames(from path: URL) -> Set<String> {
+    private static func getICNames(from xmlDoc: XMLDocument?) -> Set<String> {
         var icNames = Set<String>()
-        let xmlDoc = try? XMLDocument(contentsOf: path)
         if let nodes = try? xmlDoc?.nodes(forXPath: "//ic") as? [XMLElement] {
             for n in nodes {
                 let nameList = n.attribute(forName: "name")?.stringValue ?? ""
@@ -31,12 +43,15 @@ class SupportedDevicesProcessor {
         return icNames
     }
 
-    public static func run(_ result: InvocationResult, infoicPath: URL) throws -> SupportedDevices {
+    public static func run(
+        _ result: InvocationResult, infoicPath: URL, programmerModel: ProgrammerModel? = nil
+    ) throws -> SupportedDevices {
         try ensureNoError(invocationResult: result)
 
         let logicICsPath = Bundle.main.url(forResource: "logicic", withExtension: "xml")!
-        let logicICs = getICNames(from: logicICsPath)
-        let eepromICs = getICNames(from: infoicPath)
+        let logicICs = getICNames(from: try? XMLDocument(contentsOf: logicICsPath))
+        let infoicXmlDoc = try? XMLDocument(contentsOf: infoicPath)
+        let eepromICs = getICNames(from: infoicXmlDoc)
 
         // Custom chips have "(custom)" appended to their names:
         // https://gitlab.com/DavidGriffith/minipro/-/blob/master/src/database.c#L516
@@ -46,7 +61,20 @@ class SupportedDevicesProcessor {
 
         return SupportedDevices(
             logicICs: getLogicICs(lines, logicICs: logicICs, eepromICs: eepromICs),
-            eepromICs: getEepromICs(lines, logicICs: logicICs, eepromICs: eepromICs))
+            eepromICs: getEepromICs(lines, logicICs: logicICs, eepromICs: eepromICs),
+            catalog: chipCatalog(from: infoicXmlDoc, programmerModel: programmerModel))
+    }
+
+    /// The manufacturers only matter for the database the connected programmer
+    /// actually uses, so the catalog stays empty until the model is known.
+    private static func chipCatalog(from xmlDoc: XMLDocument?, programmerModel: ProgrammerModel?)
+        -> ChipCatalog
+    {
+        guard let xmlDoc, let programmerModel else {
+            return .empty
+        }
+        return ChipCatalog.build(
+            from: xmlDoc, databaseType: ChipCatalog.databaseType(for: programmerModel))
     }
 
     private static func getLogicICs(_ lines: [String], logicICs: Set<String>, eepromICs: Set<String>) -> [String] {

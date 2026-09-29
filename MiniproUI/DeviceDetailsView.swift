@@ -11,6 +11,10 @@ struct DeviceDetailsView: View {
     let expectLogicChip: Bool
     @Binding var deviceDetails: DeviceDetails?
     var programmerModel: ProgrammerModel? = nil
+    /// The database entry the chip was picked from. minipro's chip info says
+    /// nothing about the manufacturer or the chip ID, and both are what tells
+    /// two entries of the same name apart.
+    var variant: ChipVariant? = nil
     @State private var enlargedItem: ChipIllustration? = nil
 
     var body: some View {
@@ -21,6 +25,14 @@ struct DeviceDetailsView: View {
                     Section(header: Text("\(deviceDetails.name) Details")) {
                         ForEach(deviceDetails.deviceInfo, id: \.self) { info in
                             PropertyRow(label: info.key, value: info.value)
+                            if info.key == "Name" {
+                                if let manufacturerLabel = variant?.manufacturerLabel {
+                                    PropertyRow(label: "Manufacturer", value: manufacturerLabel)
+                                }
+                                if let chipId = variant?.formattedChipId {
+                                    PropertyRow(label: "Chip ID", value: chipId)
+                                }
+                            }
                         }
                         if expectLogicChip != deviceDetails.isLogicChip {
                             HStack {

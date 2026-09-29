@@ -80,6 +80,21 @@ SwiftUI Views → MiniproAPI → MiniproInvoker → minipro CLI binary
 - **`MiniproAPI`** is the public interface for all programmer operations. Each method invokes `MiniproInvoker` and delegates parsing to a `ResponseProcessor`.
 - **ResponseProcessors** (`MiniproUI/Minipro/ResponseProcessors/`) parse `InvocationResult` and throw typed `MiniproAPIError` values. `ensureNoError(_:)` in `ReponseProcessorUtils.swift` handles common error patterns (programmer not found, device not found, IO error, invalid chip ID, etc.) and should be called first in every processor.
 
+## Chip manufacturers
+`infoic.xml` groups chips under `<manufacturer>` (or `<custom>`) nodes, and the same name shows up
+under several of them with different parameters - "M27256@DIP28" is an INTEL part with chip ID 0x8904
+and an ST part with 0x2004. minipro has no manufacturer option: `-d` loads whichever entry matches
+the name first.
+
+`ChipCatalog` (`MiniproUI/Minipro/ChipCatalog.swift`) is built from the same `XMLDocument`
+`SupportedDevicesProcessor` already parses, for the database the connected programmer uses
+(`INFOIC`, `INFOIC2PLUS` or `INFOICT76`). Manufacturers whose entries are identical apart from the
+name are merged into one `ChipVariant`, so only real distinctions reach the list; each variant
+becomes its own `ChipListItem` row. Picking a name that has more than one variant makes
+`ChipVariantOverride` write a small database holding just that `<ic>` element (plus the
+`<configurations>` and `<maps>` sections) into the temporary directory, and every minipro call for
+that chip passes it as `--infoic`. Unambiguous chips keep using the full database.
+
 ## Adding a new programmer operation
 1. Add a `static func` to `MiniproAPI.swift`.
 2. Create `XxxProcessor.swift` in `MiniproUI/Minipro/ResponseProcessors/`. Call `ensureNoError` first, then parse the result.

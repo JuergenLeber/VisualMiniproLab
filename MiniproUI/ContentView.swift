@@ -21,6 +21,10 @@ class MiniproModel: ObservableObject {
     @Published var logicICTestResult: LogicICTestResult?
     @Published var visualMiniproInfo: VisualMiniproInfo?
     @Published var supportedDevices: SupportedDevices? = SupportedDevices(logicICs: [], eepromICs: ["Loading..."])
+    @Published var selectedChip: ChipListItem?
+    /// The database minipro is invoked with for the selected chip: an override
+    /// holding just the picked manufacturer's entry, or nil for the full one.
+    @Published var selectedChipInfoicPath: URL?
     @Published var deviceDetails: DeviceDetails?
     @Published var buffer: Data?
     @Published var readOptions = ReadOptions()
@@ -40,7 +44,10 @@ struct ContentView: View {
                 model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
                 if let programmerInfo = model.programmerInfo {
                     let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                    model.supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
+                    model.supportedDevices = try? await MiniproAPI.getSupportedDevices(
+                        infoicPath: infoicPath,
+                        programmerModel: programmerInfo.model
+                    )
                 }
                 model.visualMiniproInfo = try? await MiniproAPI.getVisualMiniproInfo()
             }.navigationSplitViewColumnWidth(min: 160, ideal: 160)

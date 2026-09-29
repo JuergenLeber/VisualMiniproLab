@@ -9,12 +9,12 @@ import SwiftUI
 
 struct LogicICTestView: View {
     @ObservedObject var model: MiniproModel
-    @State private var selectedDevice: String? = nil
+    @State private var selectedDevice: ChipListItem? = nil
     @State private var errorMessage: DialogErrorMessage? = nil
 
     var body: some View {
         let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: model.programmerInfo)
-        let supportedLogicICs = model.supportedDevices?.logicICs ?? []
+        let supportedLogicICs = model.supportedDevices?.logicChips ?? []
         VStack(alignment: .leading, spacing: 16) {
             TabHeaderView(
                 caption: "Selected Logic IC: " + (model.logicICDetails?.name ?? "None"),
@@ -74,14 +74,17 @@ struct LogicICTestView: View {
             model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
             if let programmerInfo = model.programmerInfo {
                 let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                model.supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
+                model.supportedDevices = try? await MiniproAPI.getSupportedDevices(
+                    infoicPath: infoicPath,
+                    programmerModel: programmerInfo.model
+                )
             }
         }.onChange(of: selectedDevice) {
             Task {
                 if let device = selectedDevice, let programmerInfo = model.programmerInfo {
                     let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
                     model.logicICDetails = try? await MiniproAPI.getDeviceDetails(
-                        device: device,
+                        device: device.name,
                         infoicPath: infoicPath
                     )
                 }

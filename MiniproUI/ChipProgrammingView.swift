@@ -18,19 +18,13 @@ struct ChipProgrammingView: View {
     private static let contentMinWidth: CGFloat = 320 + 80 + sideColumnMinWidth + 40
 
     @ObservedObject var model: MiniproModel
-    @State private var selectedDevice: String?
-
-    init(model: MiniproModel) {
-        self.model = model
-        self._selectedDevice = State(initialValue: model.deviceDetails?.name)
-    }
 
     var body: some View {
         let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: model.programmerInfo)
         ZStack {
             VStack(alignment: .leading, spacing: 16) {
                 TabHeaderView(
-                    caption: "Selected Chip: " + (selectedDevice ?? "None"),
+                    caption: "Selected Chip: " + selectedChipCaption,
                     systemImageName: "memorychip.fill"
                 )
                 HStack {
@@ -53,16 +47,18 @@ struct ChipProgrammingView: View {
                             device: model.deviceDetails,
                             buffer: $model.buffer,
                             readOptions: $model.readOptions,
-                            programmerInfo: $model.programmerInfo
+                            programmerInfo: $model.programmerInfo,
+                            infoicOverride: model.selectedChipInfoicPath
                         )
                         WriteChipButton(
                             device: model.deviceDetails,
                             buffer: model.buffer,
                             writeOptions: $model.writeOptions,
-                            programmerInfo: $model.programmerInfo
+                            programmerInfo: $model.programmerInfo,
+                            infoicOverride: model.selectedChipInfoicPath
                         )
                     }
-                    let supportedEEPROMs = model.supportedDevices?.eepromICs ?? []
+                    let supportedEEPROMs = model.supportedDevices?.eepromChips ?? []
                     if needsAlgorithms {
                         VStack {
                             Form {
@@ -88,7 +84,8 @@ struct ChipProgrammingView: View {
                                     DeviceDetailsView(
                                         expectLogicChip: false,
                                         deviceDetails: $model.deviceDetails,
-                                        programmerModel: model.programmerInfo?.model
+                                        programmerModel: model.programmerInfo?.model,
+                                        variant: model.selectedChip?.variant
                                     )
                                         .padding(.top, 32)
                                     Spacer()
@@ -97,7 +94,7 @@ struct ChipProgrammingView: View {
                             VStack {
                                 SearchableListView(
                                     items: supportedEEPROMs,
-                                    selectedItem: $selectedDevice,
+                                    selectedItem: $model.selectedChip,
                                     applyAdditionalFilter: $model.applyFavoriteFilter,
                                     isCollapsible: true,
                                     additionalFilter: filterFavoriteChips
@@ -119,23 +116,44 @@ struct ChipProgrammingView: View {
             model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
             if let programmerInfo = model.programmerInfo {
                 let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                model.supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
+                model.supportedDevices = try? await MiniproAPI.getSupportedDevices(
+                    infoicPath: infoicPath,
+                    programmerModel: programmerInfo.model
+                )
             }
         }
-        .onChange(of: selectedDevice) {
+        .onChange(of: model.selectedChip) {
             Task {
-                if let device = selectedDevice, let programmerInfo = model.programmerInfo {
-                    let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                    model.deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device, infoicPath: infoicPath)
+                guard let chip = model.selectedChip, let programmerInfo = model.programmerInfo else {
+                    return
                 }
+                // A name several manufacturers declare needs a database holding
+                // only the chosen one - minipro would load the first match.
+                let infoicPath = ChipVariantOverride.infoicPath(
+                    for: chip,
+                    catalog: model.supportedDevices?.catalog ?? .empty,
+                    fallback: InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
+                )
+                model.selectedChipInfoicPath = infoicPath
+                model.deviceDetails = try? await MiniproAPI.getDeviceDetails(
+                    device: chip.name, infoicPath: infoicPath)
             }
         }
     }
 
-    func filterFavoriteChips(_ supportedEEPROMs: [String]) -> [String] {
+    /// The manufacturer belongs in the header: once a chip is picked the list
+    /// collapses to its name and the details sit behind it.
+    private var selectedChipCaption: String {
+        guard let chip = model.selectedChip else {
+            return "None"
+        }
+        return [chip.name, chip.manufacturerLabel].compactMap { $0 }.joined(separator: " · ")
+    }
+
+    func filterFavoriteChips(_ supportedEEPROMs: [ChipListItem]) -> [ChipListItem] {
         let favoriteChips = UserDefaults.standard.favoriteChips
         let filteredChips = supportedEEPROMs.filter { eeprom in
-            favoriteChips.contains { eeprom.lowercased().contains($0.lowercased()) }
+            favoriteChips.contains { eeprom.name.lowercased().contains($0.lowercased()) }
         }
         return filteredChips.isEmpty ? supportedEEPROMs : filteredChips
     }
@@ -146,6 +164,7 @@ struct ReadChipButton: View {
     @Binding var buffer: Data?
     @Binding var readOptions: ReadOptions
     @Binding var programmerInfo: ProgrammerInfo?
+    let infoicOverride: URL?
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
 
@@ -162,6 +181,7 @@ struct ReadChipButton: View {
                     isPresented: $isPresented,
                     readOptions: $readOptions,
                     programmerInfo: $programmerInfo,
+                    infoicOverride: infoicOverride,
                     errorMessage: $errorMessage
                 )
             }
@@ -181,6 +201,7 @@ struct WriteChipButton: View {
     let buffer: Data?
     @Binding var writeOptions: WriteOptions
     @Binding var programmerInfo: ProgrammerInfo?
+    let infoicOverride: URL?
     @State private var isPresented = false
     @State private var errorMessage: DialogErrorMessage?
 
@@ -197,6 +218,7 @@ struct WriteChipButton: View {
                     isPresented: $isPresented,
                     writeOptions: $writeOptions,
                     programmerInfo: $programmerInfo,
+                    infoicOverride: infoicOverride,
                     errorMessage: $errorMessage
                 )
             }
